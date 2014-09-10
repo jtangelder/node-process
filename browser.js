@@ -9,7 +9,7 @@ module.exports = {
         var postMessage = win && win.postMessage;
 
         if (setImmediate) {
-            return function (f) {
+            return function nextTick(f) {
                 return setImmediate(f)
             };
         }
@@ -17,7 +17,6 @@ module.exports = {
         var queue = [];
 
         if (MutationObserver) {
-            var hiddenDiv = document.createElement("div");
             var observer = new MutationObserver(function () {
                 var queueList = queue.slice();
                 queue.length = 0;
@@ -26,13 +25,14 @@ module.exports = {
                 });
             });
 
-            observer.observe(hiddenDiv, { attributes: true });
+            var observeEl = document.createElement("a");
+            observer.observe(observeEl, { attributes: true });
 
             return function nextTick(fn) {
-                if (!queue.length) {
-                    hiddenDiv.setAttribute('yes', 'no');
-                }
                 queue.push(fn);
+                if (!queue.length) {
+                    observeEl.setAttribute("a", true);
+                }
             };
         }
 
